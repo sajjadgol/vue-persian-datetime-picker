@@ -24,7 +24,7 @@
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     line-height: 30px;
-    padding: 0 10px;
+    padding: 0 20px;
 
     &:not(.is-editable) {
       cursor: pointer;
@@ -47,6 +47,21 @@
       cursor: default;
     }
   }
+  .#{$prefix}day-change{
+    position: absolute;
+    vertical-align: middle;
+    background: #417cf4;
+    height: 100%;
+  }
+
+  .#{$prefix}day-change.#{$prefix}next-day{
+    right: -12px;
+  }
+  .#{$prefix}day-change.#{$prefix}previous-day{
+    left: -13px;
+  }
+
+  
 
   .#{$prefix}clear-btn {
     position: absolute;

@@ -32,6 +32,27 @@
         @focus="focus"
         @blur="setOutput"
       />
+      <template
+        v-if="(type === 'date' || type === 'datetime') && dayChangeShortcut"
+      >
+        <arrow
+          fill="#fff"
+          width="13"
+          direction="right"
+          :style="{ 'background-color': color }"
+          :class="[prefix('day-change'), prefix('next-day')]"
+          @click.native="changeDayBtn(1)"
+        />
+        <arrow
+          width="13"
+          fill="#fff"
+          direction="left"
+          :style="{ 'background-color': color }"
+          :class="[prefix('day-change'), prefix('previous-day')]"
+          @click.native="changeDayBtn(-1)"
+        />
+      </template>
+
       <input
         v-if="altName"
         type="hidden"
@@ -143,9 +164,9 @@
                       :class="[prefix('month-label')]"
                       @click="goStep('m')"
                     >
-                      <span :style="{ 'border-color': color, color: color }">{{
-                        date.xFormat('jMMMM jYYYY')
-                      }}</span>
+                      <span :style="{ 'border-color': color, color: color }">
+                        {{ date.xFormat('jMMMM jYYYY') }}
+                      </span>
                     </div>
                   </transition>
                 </div>
@@ -193,9 +214,9 @@
                                 :class="[prefix('day-effect')]"
                                 :style="{ 'background-color': color }"
                               />
-                              <span :class="[prefix('day-text')]">{{
-                                day.formatted
-                              }}</span>
+                              <span :class="[prefix('day-text')]">
+                                {{ day.formatted }}
+                              </span>
                             </template>
                           </div>
                         </div>
@@ -735,7 +756,17 @@ export default {
      * @example true | false | +03:30 | +04:30
      * @version 2.1.0
      */
-    timezone: { type: [Boolean, String, Function], default: false }
+    timezone: { type: [Boolean, String, Function], default: false },
+
+    /**
+     * Next and previous day shortcut
+     * @type Boolean
+     * @default False
+     * @if false, the picker will not show shortcuts
+     * @if true, the picker will show shortcuts
+     * @example <... :day-change-shortcut="true">
+     */
+    dayChangeShortcut: { type: Boolean, default: false }
   },
   data() {
     let defaultLocale = this.locale.split(',')[0]
@@ -1215,6 +1246,15 @@ export default {
     },
     prevMonth() {
       this.date = this.date.clone().xAdd(-1, 'month')
+    },
+    changeDayBtn(day) {
+      this.date = this.date.clone().xAdd(day, 'day')
+      let d = this.core.moment(this.date._i)
+      let s = this.selectedDate
+      d.set({ hour: s.hour(), minute: s.minute(), second: 0 })
+      this.selectedDate = d.clone()
+      this.submit()
+      this.nextStep()
     },
     selectDay(day) {
       if (!day.date || day.disabled) return
